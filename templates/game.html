@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center mb-0">مغامرة القصص التفاعلية</h2>
+            </div>
+            <div class="card-body">
+                <div id="story-container" class="mb-4">
+                    <p class="text-center">مرحباً بك في عالم القصص التفاعلية! اضغط على زر البدء لتبدأ مغامرتك.</p>
+                </div>
+                
+                <div id="input-container" class="mb-3 d-none">
+                    <textarea id="user-input" class="form-control mb-2" rows="3" 
+                              placeholder="اكتب ردك هنا..." dir="rtl"></textarea>
+                    <button id="submit-response" class="btn btn-primary">إرسال</button>
+                </div>
+                
+                <div id="start-container" class="text-center">
+                    <button id="start-game" class="btn btn-success btn-lg">ابدأ المغامرة</button>
+                </div>
+                
+                <div id="new-game-container" class="text-center d-none">
+                    <button id="new-game" class="btn btn-secondary">قصة جديدة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Spinner -->
+<div id="loading-spinner" class="position-fixed top-50 start-50 translate-middle d-none">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">جاري التحميل...</span>
+    </div>
+</div>
+
+<!-- Error Alert -->
+<div id="error-alert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+    <span id="error-message"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,39 @@
+/* RTL Support */
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Story text styling */
+#story-container {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    min-height: 150px;
+}
+
+/* Loading spinner overlay */
+#loading-spinner {
+    background: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Error alert positioning */
+#error-alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    min-width: 300px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card {
+        margin: 10px;
+    }
+}
