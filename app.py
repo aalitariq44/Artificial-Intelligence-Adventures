@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "default-secret-key")
 
-# Initialize story generator
-story_generator = StoryGenerator(api_key="AIzaSyD8qDZjChLT7CwQ1Lj9auydy3QcQnPjaTg")
+# Initialize story generator with API key from environment
+gemini_api_key = os.environ.get("GEMINI_API_KEY", "AIzaSyD8qDZjChLT7CwQ1Lj9auydy3QcQnPjaTg")
+story_generator = StoryGenerator(api_key=gemini_api_key)
 
 @app.route('/')
 def index():
@@ -24,10 +25,10 @@ def start_game():
     try:
         # Generate initial story
         initial_story = story_generator.generate_initial_story()
-        
+
         # Store story context in session
         session['story_context'] = [initial_story]
-        
+
         return jsonify({
             'success': True,
             'story': initial_story
@@ -43,7 +44,7 @@ def start_game():
 def continue_story():
     try:
         user_input = request.json.get('userInput')
-        
+
         if not user_input:
             return jsonify({
                 'success': False,
@@ -52,15 +53,15 @@ def continue_story():
 
         # Get story context from session
         story_context = session.get('story_context', [])
-        
+
         # Generate next part of the story
         next_part = story_generator.continue_story(story_context, user_input)
-        
+
         # Update story context
         story_context.append(user_input)
         story_context.append(next_part)
         session['story_context'] = story_context
-        
+
         return jsonify({
             'success': True,
             'story': next_part
