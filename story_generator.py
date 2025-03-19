@@ -5,16 +5,8 @@ class StoryGenerator:
     def __init__(self, api_key):
         self.api_key = api_key
         genai.configure(api_key=api_key)
-
-        # Get available models
-        self.model = None
         try:
-            for m in genai.list_models():
-                if 'generateContent' in m.supported_generation_methods:
-                    self.model = m
-                    break
-            if not self.model:
-                raise Exception("No suitable model found")
+            self.model = genai.GenerativeModel('gemini-2.0-flash')
         except Exception as e:
             logging.error(f"Error initializing model: {str(e)}")
             raise Exception("فشل في تهيئة النموذج")
