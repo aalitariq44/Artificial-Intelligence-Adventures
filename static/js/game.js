@@ -75,6 +75,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (data.success) {
+                const pointsCounter = document.getElementById('points-counter');
+                const choicesCounter = document.getElementById('choices-counter');
+                
+                pointsCounter.textContent = data.points || '0';
+                choicesCounter.textContent = data.choices_made || '0';
+                
                 storyContainer.innerHTML += `
                     <p class="user-response"><strong>ردك:</strong> ${userText}</p>
                     <p>${data.story}</p>

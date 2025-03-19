@@ -6,6 +6,13 @@ class StoryGenerator:
     def __init__(self, api_key):
         self.api_key = api_key
         genai.configure(api_key=api_key)
+        self.points_system = {
+            'survival': 10,
+            'horror': 15,
+            'adventure': 12,
+            'crime': 13,
+            'scifi': 14
+        }
         try:
             self.model = genai.GenerativeModel('gemini-2.0-flash')
         except Exception as e:

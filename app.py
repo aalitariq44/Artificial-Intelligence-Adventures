@@ -23,6 +23,10 @@ def index():
 @app.route('/start-game', methods=['POST'])
 def start_game():
     try:
+        # Initialize session variables
+        session['points'] = 0
+        session['choices_made'] = 0
+        
         # Generate initial story
         initial_story = story_generator.generate_initial_story()
 
