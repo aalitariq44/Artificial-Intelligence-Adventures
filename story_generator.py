@@ -6,13 +6,19 @@ class StoryGenerator:
     def __init__(self, api_key):
         self.api_key = api_key
         genai.configure(api_key=api_key)
-        self.points_system = {
-            'survival': 10,
-            'horror': 15,
-            'adventure': 12,
-            'crime': 13,
-            'scifi': 14
+        self.player_stats = {
+            'health': 100,
+            'reputation': 50,
+            'wisdom': 0
         }
+
+        self.decision_impacts = {
+            'brave': {'health': -10, 'reputation': 15, 'points': 20},
+            'cautious': {'health': 5, 'reputation': 5, 'points': 10},
+            'clever': {'health': 0, 'reputation': 10, 'points': 15},
+            'aggressive': {'health': -15, 'reputation': -5, 'points': 25}
+        }
+
         try:
             self.model = genai.GenerativeModel('gemini-2.0-flash')
         except Exception as e:
@@ -20,37 +26,23 @@ class StoryGenerator:
             raise Exception("فشل في تهيئة النموذج")
 
         self.story_types = {
-            'survival': [
-                'الهروب من السجن',
-                'النجاة من تحطم طائرة',
-                'البقاء في جزيرة مهجورة',
-                'مواجهة كارثة طبيعية'
-            ],
-            'horror': [
-                'منزل مسكون',
-                'مستشفى مهجور',
-                'غابة ملعونة',
-                'مدينة الأشباح'
-            ],
-            'adventure': [
-                'السفر عبر الزمن',
-                'مواجهة تنين',
-                'البحث عن كنز مفقود',
-                'استكشاف حضارة قديمة'
-            ],
-            'crime': [
-                'تحقيق غامض',
-                'الهروب من الشرطة',
-                'سرقة متحف',
-                'كشف مؤامرة'
-            ],
-            'scifi': [
-                'ذكاء اصطناعي متمرد',
-                'اختراق أنظمة مستقبلية',
-                'غزو فضائي',
-                'استعمار كوكب جديد'
-            ]
+            'survival': ['نجاة من كارثة', 'بقاء في صحراء', 'هروب من خطر'],
+            'horror': ['منزل مسكون', 'مواجهة وحش', 'ظاهرة غامضة'],
+            'adventure': ['بحث عن كنز', 'مغامرة في الغابة', 'اكتشاف سر قديم'],
+            'crime': ['حل لغز', 'مطاردة مجرم', 'كشف مؤامرة'],
+            'scifi': ['رحلة فضائية', 'مواجهة روبوتات', 'سفر عبر الزمن']
         }
+
+    def _evaluate_decision(self, user_input):
+        input_lower = user_input.lower()
+        if 'هجوم' in input_lower or 'قتال' in input_lower:
+            return 'aggressive'
+        elif 'حكمة' in input_lower or 'تفكير' in input_lower:
+            return 'clever'
+        elif 'حذر' in input_lower or 'تراجع' in input_lower:
+            return 'cautious'
+        else:
+            return 'brave'
 
     def _get_random_scenario(self):
         genre = random.choice(list(self.story_types.keys()))
@@ -61,16 +53,10 @@ class StoryGenerator:
         genre, scenario = self._get_random_scenario()
 
         prompt = f"""
-        أنت كاتب قصص تفاعلي ماهر. اكتب بداية قصة مثيرة باللغة العربية تدور حول {scenario}.
-
-        إرشادات مهمة:
-        - اكتب 3-4 جمل قوية تضع القارئ مباشرة في قلب الأحداث
-        - اجعل البداية مشوقة ومفاجئة
-        - صف المشاعر والأجواء بتفاصيل حية
-        - اطرح خيارات مثيرة للاهتمام في النهاية
-        - ضع القارئ في موقف يتطلب قراراً مصيرياً
-
-        انتهِ القصة بسؤال أو خيارات واضحة للقارئ ليقرر ما سيحدث بعد ذلك.
+        اكتب بداية قصيرة ومثيرة حول {scenario}.
+        - اكتب فقرة قصيرة (2-3 جمل) تضع القارئ في موقف حرج
+        - قدم خيارين واضحين للقارئ
+        - اجعل كل خيار له عواقب محتملة مختلفة
         """
 
         try:
@@ -81,28 +67,35 @@ class StoryGenerator:
             raise Exception("فشل في توليد القصة الأولية")
 
     def continue_story(self, story_context, user_input):
-        context = "\n".join(story_context)
+        decision_type = self._evaluate_decision(user_input)
+        impacts = self.decision_impacts[decision_type]
+
+        for stat, change in impacts.items():
+            if stat in self.player_stats:
+                self.player_stats[stat] = max(0, min(100, self.player_stats[stat] + change))
+
+        context = "\n".join(story_context[-2:])  # نحتفظ فقط بآخر جزئين من السياق
 
         prompt = f"""
-        سياق القصة حتى الآن:
+        آخر جزء من القصة:
         {context}
 
-        رد المستخدم:
+        قرار اللاعب:
         {user_input}
 
-        إرشادات استكمال القصة:
-        - استجب لقرار المستخدم بطريقة تؤثر على مسار القصة
-        - أضف تحديات وتعقيدات جديدة غير متوقعة
-        - اجعل القرارات تؤدي إلى نتائج مهمة
-        - حافظ على التشويق والإثارة في كل منعطف
-        - اكتب 3-4 جمل تصف ما يحدث نتيجة لقرار المستخدم
-
-        انتهِ دائماً بخيارات جديدة أو سؤال يضع المستخدم أمام قرار مصيري آخر.
+        اكتب استجابة قصيرة (2-3 جمل) تصف نتيجة القرار.
+        قدم خيارين جديدين واضحين.
+        الصحة: {self.player_stats['health']}
+        السمعة: {self.player_stats['reputation']}
         """
 
         try:
             response = self.model.generate_content(prompt)
-            return response.text
+            return {
+                'text': response.text,
+                'points': impacts['points'],
+                'stats': self.player_stats
+            }
         except Exception as e:
             logging.error(f"Error continuing story: {str(e)}")
             raise Exception("فشل في توليد الجزء التالي من القصة")

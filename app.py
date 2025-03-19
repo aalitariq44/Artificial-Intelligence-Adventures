@@ -26,7 +26,7 @@ def start_game():
         # Initialize session variables
         session['points'] = 0
         session['choices_made'] = 0
-        
+
         # Generate initial story
         initial_story = story_generator.generate_initial_story()
 
@@ -59,16 +59,22 @@ def continue_story():
         story_context = session.get('story_context', [])
 
         # Generate next part of the story
-        next_part = story_generator.continue_story(story_context, user_input)
+        story_response = story_generator.continue_story(story_context, user_input)
 
         # Update story context
         story_context.append(user_input)
-        story_context.append(next_part)
+        story_context.append(story_response['text'])
         session['story_context'] = story_context
+
+        # Update points
+        session['points'] = session.get('points', 0) + story_response['points']
+        session['choices_made'] = session.get('choices_made', 0) + 1
 
         return jsonify({
             'success': True,
-            'story': next_part
+            'story': story_response['text'],
+            'points': story_response['points'],
+            'stats': story_response['stats']
         })
     except Exception as e:
         logger.error(f"Error continuing story: {str(e)}")

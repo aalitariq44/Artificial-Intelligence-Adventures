@@ -51,6 +51,45 @@ body {
     margin: 10px 0;
 }
 
+/* إضافة الأنماط الجديدة بعد السطر 46 */
+.stats-container {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.progress {
+    height: 25px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.progress-bar {
+    font-size: 0.9rem;
+    line-height: 25px;
+    transition: width 0.3s ease;
+}
+
+.user-decision {
+    background: rgba(var(--bs-warning-rgb), 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border-right: 4px solid var(--bs-warning);
+}
+
+.decision-text {
+    margin-bottom: 5px;
+}
+
+.decision-impact {
+    display: flex;
+    gap: 10px;
+}
+
+.badge {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+}
+
 /* Button styling */
 .pulse-button {
     animation: pulse 2s infinite;

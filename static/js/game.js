@@ -11,6 +11,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorAlert = document.getElementById('error-alert');
     const errorMessage = document.getElementById('error-message');
 
+    function updateStats(stats) {
+        const healthBar = document.getElementById('health-bar');
+        const reputationBar = document.getElementById('reputation-bar');
+
+        if (healthBar && reputationBar) {
+            healthBar.style.width = `${stats.health}%`;
+            healthBar.textContent = `الصحة: ${stats.health}%`;
+            reputationBar.style.width = `${stats.reputation}%`;
+            reputationBar.textContent = `السمعة: ${stats.reputation}%`;
+        }
+    }
+
     function showError(message) {
         errorMessage.textContent = message;
         errorAlert.classList.remove('d-none');
@@ -36,11 +48,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json'
                 }
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
-                storyContainer.innerHTML = `<p>${data.story}</p>`;
+                storyContainer.innerHTML = `
+                    <div class="stats-container mb-3">
+                        <div class="progress mb-2">
+                            <div id="health-bar" class="progress-bar bg-danger" style="width: 100%">
+                                الصحة: 100%
+                            </div>
+                        </div>
+                        <div class="progress">
+                            <div id="reputation-bar" class="progress-bar bg-info" style="width: 50%">
+                                السمعة: 50%
+                            </div>
+                        </div>
+                    </div>
+                    <p>${data.story}</p>
+                `;
                 inputContainer.classList.remove('d-none');
                 startContainer.classList.add('d-none');
                 newGameContainer.classList.remove('d-none');
@@ -56,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function submitUserResponse() {
         const userText = userInput.value.trim();
-        
+
         if (!userText) {
             showError('الرجاء إدخال نص قبل الإرسال');
             return;
@@ -71,18 +97,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({ userInput: userText })
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
                 const pointsCounter = document.getElementById('points-counter');
                 const choicesCounter = document.getElementById('choices-counter');
-                
-                pointsCounter.textContent = data.points || '0';
-                choicesCounter.textContent = data.choices_made || '0';
-                
+
+                pointsCounter.textContent = (parseInt(pointsCounter.textContent) + data.points).toString();
+                choicesCounter.textContent = (parseInt(choicesCounter.textContent) + 1).toString();
+
+                if (data.stats) {
+                    updateStats(data.stats);
+                }
+
                 storyContainer.innerHTML += `
-                    <p class="user-response"><strong>ردك:</strong> ${userText}</p>
+                    <div class="user-decision my-3">
+                        <p class="decision-text"><strong>قرارك:</strong> ${userText}</p>
+                        <div class="decision-impact">
+                            <span class="badge bg-warning">+${data.points} نقطة</span>
+                        </div>
+                    </div>
                     <p>${data.story}</p>
                 `;
                 userInput.value = '';
@@ -102,9 +137,9 @@ document.addEventListener('DOMContentLoaded', function() {
         storyContainer.innerHTML = '';
         startNewGame();
     });
-    
+
     submitResponse.addEventListener('click', submitUserResponse);
-    
+
     userInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
