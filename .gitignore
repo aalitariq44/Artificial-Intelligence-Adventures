@@ -1,0 +1,49 @@
+# البيئة الافتراضية
+venv/
+env/
+ENV/
+.venv/
+
+# ملفات البايثون المُجمّعة
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# الملفات المؤقتة
+instance/
+.webassets-cache
+.pytest_cache/
+
+# المتغيرات البيئية والإعدادات المحلية
+.env
+.flaskenv
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# قواعد البيانات المحلية
+*.db
+*.sqlite3
+*.sqlite
+
+# ملفات النظام
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ملفات المحرر
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ملفات السجلات
+*.log
+
+# الملفات المُنشأة من التطبيق
+uploads/
+media/
